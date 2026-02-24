@@ -55,3 +55,29 @@ export const deleteCloth = async (id: string) => {
     if (error) throw error;
     return true;
 };
+
+export const uploadClothImage = async (uri: string) => {
+    const fileName = `${Date.now()}.jpg`;
+    const formData = new FormData();
+
+    // In Expo/React Native, we usually need to handle the file differently depending on the platform
+    // For simplicity and compatibility, we'll try to fetch the local uri and upload it as a blob
+    const response = await fetch(uri);
+    const blob = await response.blob();
+
+    const { data, error } = await supabase.storage
+        .from('clothes')
+        .upload(fileName, blob, {
+            contentType: 'image/jpeg',
+            cacheControl: '3600',
+            upsert: false
+        });
+
+    if (error) throw error;
+
+    const { data: { publicUrl } } = supabase.storage
+        .from('clothes')
+        .getPublicUrl(fileName);
+
+    return publicUrl;
+};

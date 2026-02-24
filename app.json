@@ -1,7 +1,7 @@
 {
     "expo": {
-        "name": "organizador",
-        "slug": "organizador",
+        "name": "Organización de la mona",
+        "slug": "organizacion-de-la-mona",
         "version": "1.0.0",
         "orientation": "portrait",
         "icon": "./assets/icon.png",

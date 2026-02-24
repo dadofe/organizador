@@ -66,18 +66,28 @@ export default function HomeScreen({ navigation }: any) {
             `;
 
             if (Platform.OS === 'web') {
-                // En Web, abrir una ventana nueva es la forma más segura de que solo se imprima el HTML generado
-                const printWindow = window.open('', '_blank');
-                if (printWindow) {
-                    printWindow.document.write(htmlContent);
-                    printWindow.document.close();
-                    // Esperar a que carguen las imágenes de los QRs (API externa)
-                    printWindow.focus();
+                // En Web, inyectamos un iframe oculto para imprimir de forma más robusta en PWAs
+                let iframe = document.getElementById('print-iframe') as HTMLIFrameElement;
+                if (!iframe) {
+                    iframe = document.createElement('iframe');
+                    iframe.id = 'print-iframe';
+                    iframe.style.position = 'absolute';
+                    iframe.style.top = '-1000px';
+                    iframe.style.left = '-1000px';
+                    document.body.appendChild(iframe);
+                }
+
+                const doc = iframe.contentWindow?.document || iframe.contentDocument;
+                if (doc) {
+                    doc.open();
+                    doc.write(htmlContent);
+                    doc.close();
+
+                    // Esperar a que carguen los QRs (API externa)
                     setTimeout(() => {
-                        printWindow.print();
-                    }, 500);
-                } else {
-                    Alert.alert('Error', 'No se pudo abrir la ventana de impresión. Por favor, permite las ventanas emergentes.');
+                        iframe.contentWindow?.focus();
+                        iframe.contentWindow?.print();
+                    }, 1000);
                 }
             } else {
                 // En móviles, generamos el PDF y usamos el diálogo nativo
@@ -98,7 +108,8 @@ export default function HomeScreen({ navigation }: any) {
 
     return (
         <View style={styles.container}>
-            <Text style={styles.title}>¿Qué quieres hacer?</Text>
+            <Text style={styles.mainTitle}>Organización de la mona</Text>
+            <Text style={styles.subtitle}>¿Qué quieres hacer?</Text>
 
             <TouchableOpacity
                 style={styles.card}
@@ -151,11 +162,20 @@ const styles = StyleSheet.create({
         padding: 20,
         backgroundColor: '#f8f9fa',
     },
-    title: {
-        fontSize: 24,
+    mainTitle: {
+        fontSize: 28,
         fontWeight: 'bold',
+        color: '#FF9500',
+        textAlign: 'center',
+        marginTop: 20,
+        marginBottom: 5,
+    },
+    subtitle: {
+        fontSize: 18,
+        fontWeight: '600',
         marginBottom: 20,
         color: '#333',
+        textAlign: 'center',
     },
     card: {
         backgroundColor: '#fff',

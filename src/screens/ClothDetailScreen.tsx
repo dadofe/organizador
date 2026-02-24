@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, StyleSheet, ActivityIndicator, Alert, TouchableOpacity, ScrollView } from 'react-native';
+import { View, Text, StyleSheet, ActivityIndicator, Alert, TouchableOpacity, ScrollView, Image } from 'react-native';
 import { getClothById, addClothToBox, removeClothFromBox, deleteCloth } from '../services/clothesService';
 import { getBoxes } from '../services/boxService';
 import { useIsFocused } from '@react-navigation/native';
@@ -79,7 +79,11 @@ export default function ClothDetailScreen({ route, navigation }: any) {
         <ScrollView style={styles.container}>
             <View style={styles.card}>
                 <View style={styles.imagePlaceholder}>
-                    <Text style={styles.emoji}>👕</Text>
+                    {cloth.image_url ? (
+                        <Image source={{ uri: cloth.image_url }} style={styles.clothImage} />
+                    ) : (
+                        <Text style={styles.emoji}>👕</Text>
+                    )}
                 </View>
                 <Text style={styles.title}>{cloth.name}</Text>
                 <Text style={styles.detail}>Tipo: {cloth.type || 'N/A'}</Text>
@@ -148,6 +152,12 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         alignItems: 'center',
         marginBottom: 15,
+        overflow: 'hidden', // Ensure image respects borderRadius
+    },
+    clothImage: {
+        width: '100%',
+        height: '100%',
+        resizeMode: 'cover',
     },
     emoji: { fontSize: 50 },
     title: { fontSize: 24, fontWeight: 'bold', marginBottom: 15 },

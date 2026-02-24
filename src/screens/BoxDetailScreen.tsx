@@ -99,6 +99,9 @@ export default function BoxDetailScreen({ route, navigation }: any) {
                 <View style={styles.headerTop}>
                     <Text style={styles.title}>{box.name}</Text>
                     <View style={styles.headerActions}>
+                        <TouchableOpacity onPress={captureAndShareQR}>
+                            <Text style={styles.iconButton}>🖨️</Text>
+                        </TouchableOpacity>
                         <TouchableOpacity onPress={() => navigation.navigate('BoxEdit', { existingBox: box })}>
                             <Text style={styles.iconButton}>✏️</Text>
                         </TouchableOpacity>
@@ -111,23 +114,13 @@ export default function BoxDetailScreen({ route, navigation }: any) {
                 {box.location && <Text style={styles.location}>📍 {box.location}</Text>}
             </View>
 
-            <View style={styles.qrContainer}>
-                <Text style={styles.qrLabel}>Código QR de la Caja</Text>
-                {box.qr_code ? (
-                    <>
-                        <ViewShot ref={viewShotRef} options={{ format: 'png', quality: 1 }}>
-                            <View style={styles.qrPrintContainer}>
-                                <Text style={styles.qrPrintTitle}>{box.name}</Text>
-                                <QRGenerator value={box.qr_code} size={150} />
-                            </View>
-                        </ViewShot>
-                        <TouchableOpacity style={styles.shareButton} onPress={captureAndShareQR}>
-                            <Text style={styles.shareButtonText}>Compartir / Imprimir QR</Text>
-                        </TouchableOpacity>
-                    </>
-                ) : (
-                    <Text>Generando QR...</Text>
-                )}
+            <View style={styles.qrPrintContainerHidden}>
+                <ViewShot ref={viewShotRef} options={{ format: 'png', quality: 1 }}>
+                    <View style={styles.qrPrintContent}>
+                        <Text style={styles.qrPrintTitle}>{box.name}</Text>
+                        <QRGenerator value={box.qr_code} size={150} />
+                    </View>
+                </ViewShot>
             </View>
 
             <Text style={styles.sectionTitle}>Prendas en esta caja ({clothes.length})</Text>
@@ -175,20 +168,16 @@ const styles = StyleSheet.create({
     title: { fontSize: 24, fontWeight: 'bold', marginBottom: 5, flex: 1 },
     desc: { fontSize: 16, color: '#666', marginBottom: 5 },
     location: { fontSize: 14, color: '#333' },
-    qrContainer: {
-        alignItems: 'center',
-        padding: 20,
-        backgroundColor: '#fff',
-        marginTop: 10,
-        marginBottom: 10,
+    qrPrintContainerHidden: {
+        position: 'absolute',
+        top: -1000,
+        left: -1000,
+        opacity: 0,
     },
-    qrLabel: { fontSize: 14, fontWeight: 'bold', marginBottom: 10, color: '#666' },
-    qrPrintContainer: { backgroundColor: '#fff', padding: 20, alignItems: 'center' },
+    qrPrintContent: { backgroundColor: '#fff', padding: 20, alignItems: 'center' },
     qrPrintTitle: { fontSize: 18, fontWeight: 'bold', marginBottom: 10, textAlign: 'center' },
-    shareButton: { marginTop: 15, padding: 10, backgroundColor: '#34C759', borderRadius: 8 },
-    shareButtonText: { color: '#fff', fontWeight: 'bold' },
-    sectionTitle: { fontSize: 18, fontWeight: 'bold', marginLeft: 16, marginTop: 10, marginBottom: 5 },
-    listContainer: { paddingBottom: 80 },
+    sectionTitle: { fontSize: 18, fontWeight: 'bold', marginLeft: 16, marginTop: 20, marginBottom: 10 },
+    listContainer: { paddingBottom: 100 },
     emptyText: { textAlign: 'center', marginTop: 20, color: '#666' },
     addButton: {
         position: 'absolute',
