@@ -1,0 +1,11 @@
+{
+    "version": 2,
+    "public": true,
+    "outputPath": "dist",
+    "rewrites": [
+        {
+            "source": "/(.*)",
+            "destination": "/index.html"
+        }
+    ]
+}
