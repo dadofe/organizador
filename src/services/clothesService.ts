@@ -12,6 +12,16 @@ export const getClothById = async (id: string) => {
     return data;
 };
 
+export const getBoxByClothId = async (clothesId: string) => {
+    const { data, error } = await supabase
+        .from('box_clothes')
+        .select('box_id')
+        .eq('clothes_id', clothesId)
+        .maybeSingle();
+    if (error) throw error;
+    return data?.box_id || null;
+};
+
 export const getClothesByBox = async (boxId: string) => {
     const { data, error } = await supabase
         .from('box_clothes')

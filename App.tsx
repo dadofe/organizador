@@ -15,6 +15,8 @@ import ClothDetailScreen from './src/screens/ClothDetailScreen';
 import ScannerScreen from './src/screens/ScannerScreen';
 import BoxEditScreen from './src/screens/BoxEditScreen';
 import ClothEditScreen from './src/screens/ClothEditScreen';
+import OutfitsScreen from './src/screens/OutfitsScreen';
+import OutfitEditScreen from './src/screens/OutfitEditScreen';
 
 // Services
 import { supabase } from './src/services/supabaseClient';
@@ -29,6 +31,8 @@ export type RootStackParamList = {
     ClothDetail: { clothId?: string, boxId?: string }; // Optional params for editing or adding to specific box
     ClothEdit: { existingCloth?: any } | undefined;
     Scanner: undefined;
+    Outfits: undefined;
+    OutfitEdit: { existingOutfit?: any } | undefined;
 };
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
@@ -61,6 +65,8 @@ export default function App() {
                             <Stack.Screen name="ClothDetail" component={ClothDetailScreen} options={{ title: 'Detalle de Prenda' }} />
                             <Stack.Screen name="ClothEdit" component={ClothEditScreen} options={{ title: 'Nueva Prenda' }} />
                             <Stack.Screen name="Scanner" component={ScannerScreen} options={{ title: 'Escanear QR' }} />
+                            <Stack.Screen name="Outfits" component={OutfitsScreen} options={{ title: 'Mis Outfits' }} />
+                            <Stack.Screen name="OutfitEdit" component={OutfitEditScreen} options={{ title: 'Sugerir Outfit' }} />
                         </>
                     ) : (
                         <Stack.Screen name="Auth" component={AuthScreen} options={{ headerShown: false }} />

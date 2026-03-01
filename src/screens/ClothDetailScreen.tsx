@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { View, Text, StyleSheet, ActivityIndicator, Alert, TouchableOpacity, ScrollView, Image } from 'react-native';
-import { getClothById, addClothToBox, removeClothFromBox, deleteCloth } from '../services/clothesService';
+import { getClothById, addClothToBox, removeClothFromBox, deleteCloth, getBoxByClothId } from '../services/clothesService';
 import { getBoxes } from '../services/boxService';
 import { useIsFocused } from '@react-navigation/native';
 
@@ -24,6 +24,12 @@ export default function ClothDetailScreen({ route, navigation }: any) {
             setLoading(true);
             const clothData = await getClothById(clothId);
             setCloth(clothData);
+
+            // If we don't have boxId from route params, fetch it from database
+            if (!initialBoxId) {
+                const boxId = await getBoxByClothId(clothId);
+                setAssignedBoxId(boxId);
+            }
 
             const availableBoxes = await getBoxes();
             setBoxes(availableBoxes || []);

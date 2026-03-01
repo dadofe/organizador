@@ -130,6 +130,15 @@ export default function HomeScreen({ navigation }: any) {
             </TouchableOpacity>
 
             <TouchableOpacity
+                style={[styles.card, styles.outfitCard]}
+                onPress={() => navigation.navigate('Outfits')}
+            >
+                <Text style={styles.cardEmoji}>✨</Text>
+                <Text style={styles.cardTitle}>Mis Outfits</Text>
+                <Text style={styles.cardDesc}>Generar y ver combinaciones con IA</Text>
+            </TouchableOpacity>
+
+            <TouchableOpacity
                 style={[styles.card, styles.scannerCard]}
                 onPress={() => navigation.navigate('Scanner')}
             >
@@ -191,6 +200,11 @@ const styles = StyleSheet.create({
     scannerCard: {
         backgroundColor: '#e6f2ff',
         borderColor: '#007AFF',
+        borderWidth: 1,
+    },
+    outfitCard: {
+        backgroundColor: '#f5f3ff',
+        borderColor: '#8B5CF6',
         borderWidth: 1,
     },
     printCard: {
