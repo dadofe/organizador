@@ -73,11 +73,14 @@ export default function BoxDetailScreen({ route, navigation }: any) {
                 style: 'destructive',
                 onPress: async () => {
                     try {
+                        console.log('Iniciando eliminación de caja:', box.id);
                         setLoading(true);
-                        await deleteBox(box.id);
+                        const result = await deleteBox(box.id);
+                        console.log('Resultado de eliminación:', result);
                         navigation.goBack();
                     } catch (error: any) {
-                        Alert.alert('Error', error.message);
+                        console.error('Error al eliminar caja:', error);
+                        Alert.alert('Error al eliminar', error.message || 'Error desconocido');
                         setLoading(false);
                     }
                 }

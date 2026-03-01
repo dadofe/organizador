@@ -1,7 +1,9 @@
 import '@expo/metro-runtime';
 import React, { useState, useEffect } from 'react';
+import { Text } from 'react-native';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
+import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { StatusBar } from 'expo-status-bar';
 
@@ -28,7 +30,7 @@ export type RootStackParamList = {
     BoxDetail: { boxId: string };
     BoxEdit: { existingBox?: any } | undefined;
     Clothes: undefined;
-    ClothDetail: { clothId?: string, boxId?: string }; // Optional params for editing or adding to specific box
+    ClothDetail: { clothId?: string, boxId?: string };
     ClothEdit: { existingCloth?: any } | undefined;
     Scanner: undefined;
     Outfits: undefined;
@@ -36,6 +38,55 @@ export type RootStackParamList = {
 };
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
+const Tab = createBottomTabNavigator();
+
+function TabNavigator() {
+    return (
+        <Tab.Navigator
+            screenOptions={{
+                headerShown: true,
+                headerStyle: { backgroundColor: '#FF9500' },
+                headerTintColor: '#fff',
+                tabBarActiveTintColor: '#FF9500',
+                tabBarInactiveTintColor: 'gray',
+                tabBarStyle: {
+                    paddingBottom: 5,
+                    height: 60,
+                    borderTopWidth: 1,
+                    borderTopColor: '#eee',
+                    backgroundColor: '#fff',
+                },
+                tabBarLabelStyle: { fontSize: 11, fontWeight: '600' }
+            }}
+        >
+            <Tab.Screen
+                name="Inicio"
+                component={HomeScreen}
+                options={{ title: 'Dashboard', tabBarIcon: () => <Text style={{ fontSize: 22 }}>🏠</Text> }}
+            />
+            <Tab.Screen
+                name="CajasTab"
+                component={BoxesScreen}
+                options={{ title: 'Cajas', tabBarIcon: () => <Text style={{ fontSize: 22 }}>📦</Text> }}
+            />
+            <Tab.Screen
+                name="RopaTab"
+                component={ClothesScreen}
+                options={{ title: 'Ropa', tabBarIcon: () => <Text style={{ fontSize: 22 }}>👕</Text> }}
+            />
+            <Tab.Screen
+                name="OutfitsTab"
+                component={OutfitsScreen}
+                options={{ title: 'Outfits', tabBarIcon: () => <Text style={{ fontSize: 22 }}>✨</Text> }}
+            />
+            <Tab.Screen
+                name="ScannerTab"
+                component={ScannerScreen}
+                options={{ title: 'Escanear', tabBarIcon: () => <Text style={{ fontSize: 22 }}>📷</Text> }}
+            />
+        </Tab.Navigator>
+    );
+}
 
 export default function App() {
     const [session, setSession] = useState<any>(null);
@@ -57,15 +108,12 @@ export default function App() {
                 <Stack.Navigator>
                     {session && session.user ? (
                         <>
-                            <Stack.Screen name="Home" component={HomeScreen} options={{ title: 'Organizador' }} />
-                            <Stack.Screen name="Boxes" component={BoxesScreen} options={{ title: 'Mis Cajas' }} />
+                            <Stack.Screen name="Home" component={TabNavigator} options={{ headerShown: false }} />
+                            {/* Stack routes for details/edits */}
                             <Stack.Screen name="BoxDetail" component={BoxDetailScreen} options={{ title: 'Detalle de Caja' }} />
-                            <Stack.Screen name="BoxEdit" component={BoxEditScreen} options={{ title: 'Nueva Caja' }} />
-                            <Stack.Screen name="Clothes" component={ClothesScreen} options={{ title: 'Mis Prendas' }} />
+                            <Stack.Screen name="BoxEdit" component={BoxEditScreen} options={{ title: 'Editar Caja' }} />
                             <Stack.Screen name="ClothDetail" component={ClothDetailScreen} options={{ title: 'Detalle de Prenda' }} />
-                            <Stack.Screen name="ClothEdit" component={ClothEditScreen} options={{ title: 'Nueva Prenda' }} />
-                            <Stack.Screen name="Scanner" component={ScannerScreen} options={{ title: 'Escanear QR' }} />
-                            <Stack.Screen name="Outfits" component={OutfitsScreen} options={{ title: 'Mis Outfits' }} />
+                            <Stack.Screen name="ClothEdit" component={ClothEditScreen} options={{ title: 'Editar Prenda' }} />
                             <Stack.Screen name="OutfitEdit" component={OutfitEditScreen} options={{ title: 'Sugerir Outfit' }} />
                         </>
                     ) : (

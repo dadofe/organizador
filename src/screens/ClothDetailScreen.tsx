@@ -61,11 +61,14 @@ export default function ClothDetailScreen({ route, navigation }: any) {
                 style: 'destructive',
                 onPress: async () => {
                     try {
+                        console.log('Iniciando eliminación de prenda:', cloth.id);
                         setLoading(true);
-                        await deleteCloth(cloth.id);
+                        const result = await deleteCloth(cloth.id);
+                        console.log('Resultado de eliminación:', result);
                         navigation.goBack();
                     } catch (error: any) {
-                        Alert.alert('Error', error.message);
+                        console.error('Error al eliminar prenda:', error);
+                        Alert.alert('Error al eliminar', error.message || 'Error desconocido');
                         setLoading(false);
                     }
                 }
