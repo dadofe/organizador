@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, StyleSheet, FlatList, ActivityIndicator, Alert, TouchableOpacity } from 'react-native';
+import { View, Text, StyleSheet, FlatList, ActivityIndicator, Alert, TouchableOpacity, Platform } from 'react-native';
 import { getBoxById, updateBoxQRCode, deleteBox } from '../services/boxService';
 import { getClothesByBox } from '../services/clothesService';
 import ClothCard from '../components/ClothCard';
@@ -66,29 +66,41 @@ export default function BoxDetailScreen({ route, navigation }: any) {
     };
 
     const handleDeleteBox = () => {
-        Alert.alert('Eliminar Caja', '¿Estás seguro de que quieres eliminar esta caja? Todas las prendas que contenga perderán su asignación.', [
-            { text: 'Cancelar', style: 'cancel' },
-            {
-                text: 'Eliminar',
-                style: 'destructive',
-                onPress: async () => {
-                    try {
-                        console.log('Iniciando eliminación de caja:', box.id);
-                        setLoading(true);
-                        const result = await deleteBox(box.id);
-                        console.log('Resultado de eliminación:', result);
-                        navigation.goBack();
-                    } catch (error: any) {
-                        console.error('Error al eliminar caja:', error);
-                        Alert.alert(
-                            'Error al eliminar',
-                            `No se pudo eliminar: ${error.message || 'Error desconocido'}\n\nDetalles: ${JSON.stringify(error)}`
-                        );
-                        setLoading(false);
-                    }
-                }
+        const title = 'Eliminar Caja';
+        const message = '¿Estás seguro de que quieres eliminar esta caja? Todas las prendas que contenga perderán su asignación.';
+
+        if (Platform.OS === 'web') {
+            const confirmed = window.confirm(`${title}\n\n${message}`);
+            if (confirmed) {
+                performDeleteBox();
             }
-        ]);
+        } else {
+            Alert.alert(title, message, [
+                { text: 'Cancelar', style: 'cancel' },
+                {
+                    text: 'Eliminar',
+                    style: 'destructive',
+                    onPress: performDeleteBox
+                }
+            ]);
+        }
+    };
+
+    const performDeleteBox = async () => {
+        try {
+            console.log('Iniciando eliminación de caja:', box.id);
+            setLoading(true);
+            const result = await deleteBox(box.id);
+            console.log('Resultado de eliminación:', result);
+            navigation.goBack();
+        } catch (error: any) {
+            console.error('Error al eliminar caja:', error);
+            Alert.alert(
+                'Error al eliminar',
+                `No se pudo eliminar: ${error.message || 'Error desconocido'}\n\nDetalles: ${JSON.stringify(error)}`
+            );
+            setLoading(false);
+        }
     };
 
     if (loading || !box) {
@@ -111,7 +123,11 @@ export default function BoxDetailScreen({ route, navigation }: any) {
                         <TouchableOpacity onPress={() => navigation.navigate('BoxEdit', { existingBox: box })}>
                             <Text style={styles.iconButton}>✏️</Text>
                         </TouchableOpacity>
-                        <TouchableOpacity onPress={handleDeleteBox} style={styles.actionIconButton}>
+                        <TouchableOpacity
+                            onPress={handleDeleteBox}
+                            style={styles.actionIconButton}
+                            activeOpacity={0.7}
+                        >
                             <Text style={styles.iconButton}>🗑</Text>
                         </TouchableOpacity>
                     </View>

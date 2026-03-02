@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, StyleSheet, ActivityIndicator, Alert, TouchableOpacity, ScrollView, Image } from 'react-native';
+import { View, Text, StyleSheet, ActivityIndicator, Alert, TouchableOpacity, ScrollView, Image, Platform } from 'react-native';
 import { getClothById, addClothToBox, removeClothFromBox, deleteCloth, getBoxByClothId } from '../services/clothesService';
 import { getBoxes } from '../services/boxService';
 import { useIsFocused } from '@react-navigation/native';
@@ -54,29 +54,41 @@ export default function ClothDetailScreen({ route, navigation }: any) {
     };
 
     const handleDelete = () => {
-        Alert.alert('Eliminar Prenda', '¿Seguro que quieres borrar esta prenda permanentemente?', [
-            { text: 'Cancelar', style: 'cancel' },
-            {
-                text: 'Eliminar',
-                style: 'destructive',
-                onPress: async () => {
-                    try {
-                        console.log('Iniciando eliminación de prenda:', cloth.id);
-                        setLoading(true);
-                        const result = await deleteCloth(cloth.id);
-                        console.log('Resultado de eliminación:', result);
-                        navigation.goBack();
-                    } catch (error: any) {
-                        console.error('Error al eliminar prenda:', error);
-                        Alert.alert(
-                            'Error al eliminar',
-                            `No se pudo eliminar: ${error.message || 'Error desconocido'}\n\nDetalles: ${JSON.stringify(error)}`
-                        );
-                        setLoading(false);
-                    }
-                }
+        const title = 'Eliminar Prenda';
+        const message = '¿Seguro que quieres borrar esta prenda permanentemente?';
+
+        if (Platform.OS === 'web') {
+            const confirmed = window.confirm(`${title}\n\n${message}`);
+            if (confirmed) {
+                performDelete();
             }
-        ]);
+        } else {
+            Alert.alert(title, message, [
+                { text: 'Cancelar', style: 'cancel' },
+                {
+                    text: 'Eliminar',
+                    style: 'destructive',
+                    onPress: performDelete
+                }
+            ]);
+        }
+    };
+
+    const performDelete = async () => {
+        try {
+            console.log('Iniciando eliminación de prenda:', cloth.id);
+            setLoading(true);
+            const result = await deleteCloth(cloth.id);
+            console.log('Resultado de eliminación:', result);
+            navigation.goBack();
+        } catch (error: any) {
+            console.error('Error al eliminar prenda:', error);
+            Alert.alert(
+                'Error al eliminar',
+                `No se pudo eliminar: ${error.message || 'Error desconocido'}\n\nDetalles: ${JSON.stringify(error)}`
+            );
+            setLoading(false);
+        }
     };
 
     if (loading || !cloth) {
@@ -111,7 +123,11 @@ export default function ClothDetailScreen({ route, navigation }: any) {
                     >
                         <Text style={styles.actionText}>✏️ Editar</Text>
                     </TouchableOpacity>
-                    <TouchableOpacity style={styles.deleteButton} onPress={handleDelete}>
+                    <TouchableOpacity
+                        style={styles.deleteButton}
+                        onPress={handleDelete}
+                        activeOpacity={0.7}
+                    >
                         <Text style={styles.actionTextWhite}>🗑 Eliminar</Text>
                     </TouchableOpacity>
                 </View>
