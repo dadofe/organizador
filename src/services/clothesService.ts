@@ -61,8 +61,12 @@ export const updateCloth = async (id: string, clothData: any) => {
 };
 
 export const deleteCloth = async (id: string) => {
+    // La base de datos tiene ON DELETE CASCADE para box_clothes y outfit_clothes
     const { error } = await supabase.from('clothes').delete().eq('id', id);
-    if (error) throw error;
+    if (error) {
+        console.error('Error al borrar prenda:', error);
+        throw error;
+    }
     return true;
 };
 
