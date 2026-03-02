@@ -68,7 +68,10 @@ export default function ClothDetailScreen({ route, navigation }: any) {
                         navigation.goBack();
                     } catch (error: any) {
                         console.error('Error al eliminar prenda:', error);
-                        Alert.alert('Error al eliminar', error.message || 'Error desconocido');
+                        Alert.alert(
+                            'Error al eliminar',
+                            `No se pudo eliminar: ${error.message || 'Error desconocido'}\n\nDetalles: ${JSON.stringify(error)}`
+                        );
                         setLoading(false);
                     }
                 }

@@ -80,7 +80,10 @@ export default function BoxDetailScreen({ route, navigation }: any) {
                         navigation.goBack();
                     } catch (error: any) {
                         console.error('Error al eliminar caja:', error);
-                        Alert.alert('Error al eliminar', error.message || 'Error desconocido');
+                        Alert.alert(
+                            'Error al eliminar',
+                            `No se pudo eliminar: ${error.message || 'Error desconocido'}\n\nDetalles: ${JSON.stringify(error)}`
+                        );
                         setLoading(false);
                     }
                 }
@@ -108,7 +111,7 @@ export default function BoxDetailScreen({ route, navigation }: any) {
                         <TouchableOpacity onPress={() => navigation.navigate('BoxEdit', { existingBox: box })}>
                             <Text style={styles.iconButton}>✏️</Text>
                         </TouchableOpacity>
-                        <TouchableOpacity onPress={handleDeleteBox}>
+                        <TouchableOpacity onPress={handleDeleteBox} style={styles.actionIconButton}>
                             <Text style={styles.iconButton}>🗑</Text>
                         </TouchableOpacity>
                     </View>
@@ -171,6 +174,7 @@ const styles = StyleSheet.create({
     title: { fontSize: 24, fontWeight: 'bold', marginBottom: 5, flex: 1 },
     desc: { fontSize: 16, color: '#666', marginBottom: 5 },
     location: { fontSize: 14, color: '#333' },
+    actionIconButton: { padding: 10, marginHorizontal: -5 },
     qrPrintContainerHidden: {
         position: 'absolute',
         top: -1000,
