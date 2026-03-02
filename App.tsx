@@ -1,10 +1,10 @@
 import '@expo/metro-runtime';
 import React, { useState, useEffect } from 'react';
-import { Text } from 'react-native';
+import { Text, View, ActivityIndicator } from 'react-native';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
-import { SafeAreaProvider } from 'react-native-safe-area-context';
+import { SafeAreaProvider, initialWindowMetrics } from 'react-native-safe-area-context';
 import { StatusBar } from 'expo-status-bar';
 
 // Screens
@@ -62,27 +62,42 @@ function TabNavigator() {
             <Tab.Screen
                 name="Inicio"
                 component={HomeScreen}
-                options={{ title: 'Dashboard', tabBarIcon: () => <Text style={{ fontSize: 22 }}>🏠</Text> }}
+                options={{
+                    title: 'Dashboard',
+                    tabBarIcon: ({ size }) => <Text style={{ fontSize: size || 22 }}>🏠</Text>
+                }}
             />
             <Tab.Screen
                 name="CajasTab"
                 component={BoxesScreen}
-                options={{ title: 'Cajas', tabBarIcon: () => <Text style={{ fontSize: 22 }}>📦</Text> }}
+                options={{
+                    title: 'Cajas',
+                    tabBarIcon: ({ size }) => <Text style={{ fontSize: size || 22 }}>📦</Text>
+                }}
             />
             <Tab.Screen
                 name="RopaTab"
                 component={ClothesScreen}
-                options={{ title: 'Ropa', tabBarIcon: () => <Text style={{ fontSize: 22 }}>👕</Text> }}
+                options={{
+                    title: 'Ropa',
+                    tabBarIcon: ({ size }) => <Text style={{ fontSize: size || 22 }}>👕</Text>
+                }}
             />
             <Tab.Screen
                 name="OutfitsTab"
                 component={OutfitsScreen}
-                options={{ title: 'Outfits', tabBarIcon: () => <Text style={{ fontSize: 22 }}>✨</Text> }}
+                options={{
+                    title: 'Outfits',
+                    tabBarIcon: ({ size }) => <Text style={{ fontSize: size || 22 }}>✨</Text>
+                }}
             />
             <Tab.Screen
                 name="ScannerTab"
                 component={ScannerScreen}
-                options={{ title: 'Escanear', tabBarIcon: () => <Text style={{ fontSize: 22 }}>📷</Text> }}
+                options={{
+                    title: 'Escanear',
+                    tabBarIcon: ({ size }) => <Text style={{ fontSize: size || 22 }}>📷</Text>
+                }}
             />
         </Tab.Navigator>
     );
@@ -90,26 +105,43 @@ function TabNavigator() {
 
 export default function App() {
     const [session, setSession] = useState<any>(null);
+    const [initializing, setInitializing] = useState(true);
 
     useEffect(() => {
+        // Fetch session initially
         supabase.auth.getSession().then(({ data: { session } }) => {
             setSession(session);
+            setInitializing(false);
+        }).catch(() => {
+            setInitializing(false);
         });
 
-        supabase.auth.onAuthStateChange((_event, session) => {
+        // Listen for changes
+        const { data: authListener } = supabase.auth.onAuthStateChange((_event, session) => {
             setSession(session);
         });
+
+        return () => {
+            authListener?.subscription.unsubscribe();
+        };
     }, []);
 
+    if (initializing) {
+        return (
+            <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: '#fff' }}>
+                <ActivityIndicator size="large" color="#FF9500" />
+            </View>
+        );
+    }
+
     return (
-        <SafeAreaProvider>
+        <SafeAreaProvider initialMetrics={initialWindowMetrics} style={{ flex: 1 }}>
             <NavigationContainer>
                 <StatusBar style="auto" />
                 <Stack.Navigator>
                     {session && session.user ? (
                         <>
                             <Stack.Screen name="Home" component={TabNavigator} options={{ headerShown: false }} />
-                            {/* Stack routes for details/edits */}
                             <Stack.Screen name="BoxDetail" component={BoxDetailScreen} options={{ title: 'Detalle de Caja' }} />
                             <Stack.Screen name="BoxEdit" component={BoxEditScreen} options={{ title: 'Editar Caja' }} />
                             <Stack.Screen name="ClothDetail" component={ClothDetailScreen} options={{ title: 'Detalle de Prenda' }} />
